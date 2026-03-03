@@ -15,6 +15,10 @@ interface VideoCardProps {
   index: number;
 }
 
+function isInstagramUrl(url: string) {
+  return /instagram\.com/i.test(url);
+}
+
 export function VideoCard({
   videoNumber,
   title,
@@ -26,6 +30,7 @@ export function VideoCard({
   index,
 }: VideoCardProps) {
   const [loaded, setLoaded] = useState(false);
+  const isIG = isInstagramUrl(embedUrl);
 
   return (
     <motion.div
@@ -44,20 +49,60 @@ export function VideoCard({
         </div>
       )}
 
-      {/* Embed */}
+      {/* Embed / IG Fallback */}
       <div className="relative aspect-video bg-black/5">
-        {!loaded && (
-          <div className="absolute inset-0 skeleton" />
+        {isIG ? (
+          <a
+            href={embedUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute inset-0 flex flex-col items-center justify-center gap-3
+                       bg-gradient-to-br from-[#833ab4] via-[#fd1d1d] to-[#fcb045]
+                       cursor-pointer transition-transform hover:scale-[1.02]"
+          >
+            {/* Instagram icon */}
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+              <circle cx="12" cy="12" r="5" />
+              <circle cx="17.5" cy="6.5" r="1.2" fill="white" stroke="none" />
+            </svg>
+            <span className="text-white text-sm font-semibold tracking-wide drop-shadow-md">
+              Watch on Instagram
+            </span>
+            {/* Play triangle */}
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="white"
+              className="opacity-80"
+            >
+              <polygon points="5,3 19,12 5,21" />
+            </svg>
+          </a>
+        ) : (
+          <>
+            {!loaded && <div className="absolute inset-0 skeleton" />}
+            <iframe
+              src={embedUrl}
+              title={title}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              loading="lazy"
+              onLoad={() => setLoaded(true)}
+              className={`w-full h-full ${loaded ? "opacity-100" : "opacity-0"} transition-opacity duration-300`}
+            />
+          </>
         )}
-        <iframe
-          src={embedUrl}
-          title={title}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          loading="lazy"
-          onLoad={() => setLoaded(true)}
-          className={`w-full h-full ${loaded ? "opacity-100" : "opacity-0"} transition-opacity duration-300`}
-        />
       </div>
 
       {/* Content */}
