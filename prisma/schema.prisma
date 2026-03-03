@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Video {
+  id          String         @id @default(cuid())
+  videoNumber String         @unique
+  title       String
+  description String         @default("")
+  platform    String         @default("YouTube")
+  embedUrl    String
+  tags        String         @default("[]") // JSON array stored as string for SQLite
+  viewCount   Int            @default(0)
+  pinned      Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  resources   ResourceLink[]
+
+  @@index([videoNumber])
+  @@index([viewCount])
+}
+
+model ResourceLink {
+  id          String   @id @default(cuid())
+  videoId     String
+  title       String
+  url         String
+  description String   @default("")
+  visitCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  video       Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@index([videoId])
+  @@index([visitCount])
+}
