@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 const prisma = new PrismaClient();
 
 async function main() {
-  // Create admin user
+  // Create admin user (credentials login)
   const hashedPassword = await bcrypt.hash("admin123", 12);
 
   await prisma.user.upsert({
@@ -12,11 +12,13 @@ async function main() {
     update: { password: hashedPassword },
     create: {
       username: "skar",
+      email: "skaryt2k23@gmail.com",
       password: hashedPassword,
+      role: "admin",
     },
   });
 
-  console.log("✅ Admin user created (username: skar, password: admin123)");
+  console.log("✅ Admin user created (username: skar, email: skaryt2k23@gmail.com)");
 
   // Clear existing data
   await prisma.resourceLink.deleteMany({});
