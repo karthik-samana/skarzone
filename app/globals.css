@@ -1,0 +1,186 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
+  --color-accent: var(--accent);
+  --color-accent-glow: var(--accent-glow);
+  --color-surface: var(--srf);
+  --color-surface-hover: var(--srf-h);
+  --color-border: var(--bdr);
+  --color-muted: var(--mtd);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-josefin-sans);
+  --font-brand: var(--font-orbitron);
+  --font-clean: var(--font-space-grotesk);
+}
+
+:root {
+  --bg: #ffffff;
+  --fg: #0a0a0a;
+  --accent: #0a0a0a;
+  --accent-glow: #000000;
+  --srf: #f4f4f5;
+  --srf-h: #e4e4e7;
+  --bdr: #d4d4d8;
+  --mtd: #52525b;
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --grid-line-color: rgba(0, 0, 0, 0.06);
+}
+
+.dark {
+  --bg: #09090b;
+  --fg: #fafafa;
+  --accent: #ffffff;
+  --accent-glow: #ffffff;
+  --srf: #18181b;
+  --srf-h: #27272a;
+  --bdr: #3f3f46;
+  --mtd: #a1a1aa;
+  --background: #09090b;
+  --foreground: #fafafa;
+  --grid-line-color: rgba(255, 255, 255, 0.04);
+}
+
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.2s ease;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #525252;
+  border-radius: 3px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #a1a1aa;
+}
+
+.glow-accent {
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.08), 0 0 30px rgba(0, 0, 0, 0.04);
+}
+.dark .glow-accent {
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1), 0 0 30px rgba(255, 255, 255, 0.05);
+}
+
+.glow-accent-strong {
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.12), 0 0 40px rgba(0, 0, 0, 0.06);
+}
+.dark .glow-accent-strong {
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.15), 0 0 40px rgba(255, 255, 255, 0.08);
+}
+
+/* Text scramble glitch animation */
+@keyframes glitch-1 {
+  0%, 100% { clip-path: inset(0 0 88% 0); transform: translate(-2px, -1px); }
+  25% { clip-path: inset(20% 0 60% 0); transform: translate(2px, 1px); }
+  50% { clip-path: inset(50% 0 30% 0); transform: translate(-1px, 2px); }
+  75% { clip-path: inset(70% 0 10% 0); transform: translate(1px, -2px); }
+}
+@keyframes glitch-2 {
+  0%, 100% { clip-path: inset(65% 0 0 0); transform: translate(2px, 1px); }
+  25% { clip-path: inset(40% 0 30% 0); transform: translate(-2px, -1px); }
+  50% { clip-path: inset(10% 0 70% 0); transform: translate(1px, -2px); }
+  75% { clip-path: inset(0 0 85% 0); transform: translate(-1px, 2px); }
+}
+
+.glitch-text {
+  position: relative;
+}
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.glitch-text::before {
+  color: var(--color-accent);
+  animation: glitch-1 3s infinite linear;
+  opacity: 0.4;
+}
+.glitch-text::after {
+  color: var(--color-accent);
+  animation: glitch-2 3s infinite linear;
+  animation-delay: 0.1s;
+  opacity: 0.25;
+}
+
+/* Flicker for the subtitle */
+@keyframes text-flicker {
+  0%, 100% { opacity: 1; }
+  3% { opacity: 0.4; }
+  6% { opacity: 1; }
+  7.5% { opacity: 0.3; }
+  9% { opacity: 1; }
+  50% { opacity: 1; }
+  52% { opacity: 0.5; }
+  53% { opacity: 1; }
+}
+
+.text-flicker {
+  animation: text-flicker 4s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--color-surface) 25%, var(--color-surface-hover) 50%, var(--color-surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Theme background animations */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+.star-twinkle {
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes sun-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.2; }
+  50% { transform: scale(1.15); opacity: 0.35; }
+}
+.sun-pulse {
+  animation: sun-pulse 4s ease-in-out infinite;
+}
+
+@keyframes sun-rays-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.sun-rays {
+  animation: sun-rays-spin 30s linear infinite;
+}
+
+@keyframes cloud-drift {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(30px); }
+  100% { transform: translateX(0); }
+}
+.cloud-drift {
+  animation: cloud-drift 12s ease-in-out infinite;
+}
+.cloud-drift-slow {
+  animation: cloud-drift 18s ease-in-out infinite;
+}
