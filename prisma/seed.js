@@ -1,11 +1,26 @@
 const { PrismaClient } = require("@prisma/client");
+const { PrismaLibSql } = require("@prisma/adapter-libsql");
+const { createClient } = require("@libsql/client");
 const bcrypt = require("bcryptjs");
 
-const prisma = new PrismaClient();
+function createPrisma() {
+  if (process.env.TURSO_DATABASE_URL && process.env.TURSO_AUTH_TOKEN) {
+    const libsql = createClient({
+      url: process.env.TURSO_DATABASE_URL,
+      authToken: process.env.TURSO_AUTH_TOKEN,
+    });
+    const adapter = new PrismaLibSql(libsql);
+    return new PrismaClient({ adapter });
+  }
+  return new PrismaClient();
+}
+
+const prisma = createPrisma();
 
 async function main() {
   // Create admin user (credentials login)
-  const hashedPassword = await bcrypt.hash("admin123", 12);
+  const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+  const hashedPassword = await bcrypt.hash(adminPassword, 12);
 
   await prisma.user.upsert({
     where: { username: "skar" },
