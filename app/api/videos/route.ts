@@ -34,6 +34,11 @@ export async function GET(req: NextRequest) {
     take: take + 1,
     ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
     orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
+    include: {
+      resources: {
+        orderBy: { visitCount: "desc" },
+      },
+    },
   });
 
   const hasMore = videos.length > take;

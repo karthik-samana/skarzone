@@ -369,7 +369,8 @@ function AdminDashboard() {
                              focus:border-accent focus:outline-none"
                   >
                     <option value="YouTube">YouTube</option>
-                    <option value="Instagram">Instagram</option>
+                    <option value="Instagram">Instagram Reel</option>
+                    <option value="Instagram Post">Instagram Post</option>
                   </select>
                 </div>
                 <input

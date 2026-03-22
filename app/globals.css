@@ -84,6 +84,13 @@ body {
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.15), 0 0 40px rgba(255, 255, 255, 0.08);
 }
 
+.dropdown-shadow {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+.dark .dropdown-shadow {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
 /* Text scramble glitch animation */
 @keyframes glitch-1 {
   0%, 100% { clip-path: inset(0 0 88% 0); transform: translate(-2px, -1px); }
