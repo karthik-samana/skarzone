@@ -5,55 +5,61 @@ import { authOptions } from "@/lib/auth";
 
 // GET /api/videos - Paginated list with filtering
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const cursor = searchParams.get("cursor");
-  const take = parseInt(searchParams.get("take") || "9");
-  const tag = searchParams.get("tag");
-  const search = searchParams.get("search");
-  const videoNumber = searchParams.get("videoNumber");
+  try {
+    const { searchParams } = new URL(req.url);
+    const cursor = searchParams.get("cursor");
+    const take = parseInt(searchParams.get("take") || "9");
+    const tag = searchParams.get("tag");
+    const search = searchParams.get("search");
+    const videoNumber = searchParams.get("videoNumber");
 
-  const where: Record<string, unknown> = {};
+    const where: Record<string, unknown> = {};
 
-  if (tag) {
-    where.tags = { contains: tag };
-  }
-  if (videoNumber) {
-    where.videoNumber = { contains: videoNumber };
-  }
-  if (search) {
-    where.OR = [
-      { title: { contains: search } },
-      { description: { contains: search } },
-      { videoNumber: { contains: search } },
-      { tags: { contains: search } },
-    ];
-  }
+    if (tag) {
+      where.tags = { contains: tag };
+    }
+    if (videoNumber) {
+      where.videoNumber = { contains: videoNumber };
+    }
+    if (search) {
+      where.OR = [
+        { title: { contains: search } },
+        { description: { contains: search } },
+        { videoNumber: { contains: search } },
+        { tags: { contains: search } },
+      ];
+    }
 
-  const videos = await prisma.video.findMany({
-    where,
-    take: take + 1,
-    ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
-    orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
-    include: {
-      resources: {
-        orderBy: { visitCount: "desc" },
+    const videos = await prisma.video.findMany({
+      where,
+      take: take + 1,
+      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
+      orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
+      include: {
+        resources: true,
       },
-    },
-  });
+    });
 
-  const hasMore = videos.length > take;
-  const data = hasMore ? videos.slice(0, take) : videos;
-  const nextCursor = hasMore ? data[data.length - 1].id : null;
+    const hasMore = videos.length > take;
+    const data = hasMore ? videos.slice(0, take) : videos;
+    const nextCursor = hasMore ? data[data.length - 1].id : null;
 
-  const total = await prisma.video.count({ where });
+    const total = await prisma.video.count({ where });
 
-  // Parse tags from JSON string
-  const parsed = data.map((v) => ({
-    ...v,
-    tags: JSON.parse(v.tags || "[]"),
-  }));
+    // Parse tags from JSON string
+    const parsed = data.map((v) => ({
+      ...v,
+      tags: JSON.parse(v.tags || "[]"),
+    }));
 
-  return NextResponse.json({ data: parsed, nextCursor, total });
+    return NextResponse.json({ data: parsed, nextCursor, total });
+  } catch (error) {
+    console.error("GET /api/videos error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch videos", data: [], nextCursor: null, total: 0 },
+      { status: 500 }
+    );
+  }
 }
 
 // POST /api/videos - Create new video (admin only)
