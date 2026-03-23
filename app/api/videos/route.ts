@@ -35,9 +35,6 @@ export async function GET(req: NextRequest) {
       take: take + 1,
       ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
       orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
-      include: {
-        resources: true,
-      },
     });
 
     const hasMore = videos.length > take;
@@ -46,10 +43,28 @@ export async function GET(req: NextRequest) {
 
     const total = await prisma.video.count({ where });
 
-    // Parse tags from JSON string
+    // Fetch resource counts separately (Turso doesn't support Prisma includes)
+    const videoIds = data.map((v) => v.id);
+    const resourceLinks = videoIds.length > 0
+      ? await prisma.resourceLink.findMany({
+          where: { videoId: { in: videoIds } },
+          select: { id: true, videoId: true, title: true, url: true, description: true, visitCount: true },
+        })
+      : [];
+
+    // Group resources by video ID
+    const resourcesByVideoId = new Map<string, typeof resourceLinks>();
+    for (const link of resourceLinks) {
+      const existing = resourcesByVideoId.get(link.videoId) || [];
+      existing.push(link);
+      resourcesByVideoId.set(link.videoId, existing);
+    }
+
+    // Parse tags from JSON string and attach resources
     const parsed = data.map((v) => ({
       ...v,
       tags: JSON.parse(v.tags || "[]"),
+      resources: resourcesByVideoId.get(v.id) || [],
     }));
 
     return NextResponse.json({ data: parsed, nextCursor, total });
