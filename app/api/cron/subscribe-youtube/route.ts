@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const callbackUrl = `${baseUrl}/api/webhook/youtube`;
+  const callbackUrl = `${baseUrl.replace(/\/+$/, "")}/api/webhook/youtube`;
   const topicUrl = `https://www.youtube.com/xml/feeds/videos.xml?channel_id=${channelId}`;
 
   // ── Subscribe to PubSubHubbub Hub ──
